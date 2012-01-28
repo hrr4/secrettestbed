@@ -168,7 +168,7 @@ int main() {
 
   while (window.IsOpen()) {
     b2Vec2 vel = player.mMyBody->GetLinearVelocity();
-    float desiredVel = 0;
+    float desiredVel = 0, velChange = 0, impulse = 0;;
 
     sf::Event myEvent;
     while (window.PollEvent(myEvent)) {
@@ -186,24 +186,16 @@ int main() {
       }
     }
 
-    /*if (sf::Keyboard::IsKeyPressed(sf::Keyboard::Down)) {
-      player.mMyBody->ApplyForce(b2Vec2(0, 500 * myWorld.mTimeStep),  player.mMyBody->GetWorldCenter());
-    } 
-    if (sf::Keyboard::IsKeyPressed(sf::Keyboard::Up)) {
-      player.mMyBody->ApplyLinearImpulse(b2Vec2(0, -500 * myWorld.mTimeStep),  player.mMyBody->GetWorldCenter());
-    } */
     if (sf::Keyboard::IsKeyPressed(sf::Keyboard::Left)) {
       desiredVel = -5;
-      float velChange = desiredVel - vel.x;
-      float impulse = player.mMyBody->GetMass() * velChange;
-      player.mMyBody->ApplyLinearImpulse(b2Vec2(impulse, 0),  player.mMyBody->GetWorldCenter());
 
     } else if (sf::Keyboard::IsKeyPressed(sf::Keyboard::Right)) {
       desiredVel = 5;
-      float velChange = desiredVel - vel.x;
-      float impulse = player.mMyBody->GetMass() * velChange;
-      player.mMyBody->ApplyLinearImpulse(b2Vec2(impulse, 0),  player.mMyBody->GetWorldCenter());
     }
+
+    velChange = desiredVel - vel.x;
+    impulse = player.mMyBody->GetMass() * velChange;
+    player.mMyBody->ApplyLinearImpulse(b2Vec2(impulse, 0),  player.mMyBody->GetWorldCenter());
 
     player.mShape.SetPosition(player.mMyBody->GetPosition().x, player.mMyBody->GetPosition().y);
 
