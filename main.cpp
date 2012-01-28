@@ -96,7 +96,7 @@ void Actor::Render(sf::RenderWindow& _window) {
 class CustomContactListener : public b2ContactListener {
   void BeginContact(b2Contact* contact) {
     // if fixture A is an Actor
-    void* bodyUserData = contact->GetFixtureA()->GetBody()->GetUserData();
+     void* bodyUserData = contact->GetFixtureA()->GetBody()->GetUserData();
     if (bodyUserData)
       static_cast<Actor*>(bodyUserData)->startContact();
 
@@ -110,12 +110,12 @@ class CustomContactListener : public b2ContactListener {
     // if fixture A is an Actor
     void* bodyUserData = contact->GetFixtureA()->GetBody()->GetUserData();
     if (bodyUserData)
-      static_cast<Actor*>(bodyUserData)->startContact();
+      static_cast<Actor*>(bodyUserData)->endContact();
 
     // if fixture B is an Actor
     bodyUserData = contact->GetFixtureB()->GetBody()->GetUserData();
     if (bodyUserData)
-      static_cast<Actor*>(bodyUserData)->startContact();
+      static_cast<Actor*>(bodyUserData)->endContact();
   }
 };
 
@@ -179,7 +179,7 @@ int main() {
         // Jump
         if (myEvent.Key.Code == sf::Keyboard::Space) {
           desiredVel = -20;
-          float velChange = desiredVel - vel.x;
+          float velChange = desiredVel - vel.y;
           float impulse = player.mMyBody->GetMass() * velChange;
           player.mMyBody->ApplyLinearImpulse(b2Vec2(0, impulse), player.mMyBody->GetWorldCenter());
         }
@@ -197,12 +197,12 @@ int main() {
       float velChange = desiredVel - vel.x;
       float impulse = player.mMyBody->GetMass() * velChange;
       player.mMyBody->ApplyLinearImpulse(b2Vec2(impulse, 0),  player.mMyBody->GetWorldCenter());
-    } 
-    if (sf::Keyboard::IsKeyPressed(sf::Keyboard::Right)) {
+
+    } else if (sf::Keyboard::IsKeyPressed(sf::Keyboard::Right)) {
       desiredVel = 5;
       float velChange = desiredVel - vel.x;
       float impulse = player.mMyBody->GetMass() * velChange;
-      player.mMyBody->ApplyForce(b2Vec2(impulse, 0),  player.mMyBody->GetWorldCenter());
+      player.mMyBody->ApplyLinearImpulse(b2Vec2(impulse, 0),  player.mMyBody->GetWorldCenter());
     }
 
     player.mShape.SetPosition(player.mMyBody->GetPosition().x, player.mMyBody->GetPosition().y);
@@ -220,8 +220,6 @@ int main() {
     myWorld.stepIteration();
 
     window.Display();
-
-    //myWorld.getWorldHandle().ClearForces();
   }
 
   myWorld.getWorldHandle().DestroyBody(groundBody);
