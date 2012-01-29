@@ -90,6 +90,7 @@ void Actor::Render(sf::RenderWindow& _window) {
     mShape.SetFillColor(sf::Color::Yellow);
   else
     mShape.SetFillColor(sf::Color::Red);
+
   _window.Draw(mShape);
 }
 
@@ -132,10 +133,11 @@ Level::~Level() {}
 
 int main() {
   // testing out chain shapes
-  b2Vec2 verts[3];
-  verts[0].Set(600, 300);
-  verts[1].Set(630, 300);
-  verts[2].Set(615, 307);
+  b2Vec2 verts[4];
+  verts[0].Set(0, 0);
+  verts[1].Set(50, 0);
+  verts[2].Set(100, 0);
+  verts[3].Set(200, -50);
   bool running = true;
   sf::RenderWindow window(sf::VideoMode(800, 600), "Box2d + SFML");
   CustomContactListener myContactListenerInstance;
@@ -150,20 +152,20 @@ int main() {
   // Chain Shape
   b2BodyDef chainBodyDef;
   chainBodyDef.type = b2_staticBody;
-  chainBodyDef.position.Set(verts[0].x, verts[0].y);
-  chainBodyDef.active = true;
+  chainBodyDef.position.Set(0, 300);
 
-  b2EdgeShape chain;
-  chain.Set(verts[0], verts[1]);
+  b2ChainShape chain;
+  chain.CreateChain(verts, 4);
 
   b2Body* chainBody = myWorld.getWorldHandle().CreateBody(&chainBodyDef);
 
   chainBody->CreateFixture(&chain, 1.f);
 
   sf::RectangleShape chainShape;
-  chainShape.SetPosition(600, 300);
+  chainShape.SetPosition(verts[0].x, verts[0].y);
   chainShape.SetFillColor(sf::Color::Green);
-  chainShape.SetSize(sf::Vector2f(30,1));
+  chainShape.SetSize(sf::Vector2f(630,1));
+  //chainShape.SetOrigin(chainShape.GetSize().x/2, chainShape.GetSize().y/2);
 
   // /Chain Shape
 
