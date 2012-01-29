@@ -131,6 +131,12 @@ private:
 Level::~Level() {}
 
 int main() {
+  // testing out chain shapes
+  b2Vec2 verts[3];
+  verts[0].Set(600, 300);
+  verts[1].Set(630, 300);
+  verts[2].Set(615, 307);
+  bool running = true;
   sf::RenderWindow window(sf::VideoMode(800, 600), "Box2d + SFML");
   CustomContactListener myContactListenerInstance;
 
@@ -141,8 +147,26 @@ int main() {
 
   Actor player(&myWorld, 400, 50);
 
+  // Chain Shape
+  b2BodyDef chainBodyDef;
+  chainBodyDef.type = b2_staticBody;
+  chainBodyDef.position.Set(verts[0].x, verts[0].y);
+  chainBodyDef.active = true;
 
-  bool running = true;
+  b2EdgeShape chain;
+  chain.Set(verts[0], verts[1]);
+
+  b2Body* chainBody = myWorld.getWorldHandle().CreateBody(&chainBodyDef);
+
+  chainBody->CreateFixture(&chain, 1.f);
+
+  sf::RectangleShape chainShape;
+  chainShape.SetPosition(600, 300);
+  chainShape.SetFillColor(sf::Color::Green);
+  chainShape.SetSize(sf::Vector2f(30,1));
+
+  // /Chain Shape
+
 
   b2BodyDef groundBodyDef;
   groundBodyDef.type = b2_staticBody;
@@ -156,7 +180,6 @@ int main() {
   sf::RectangleShape groundShape(sf::Vector2f(300, 100));
   groundShape.SetPosition(groundBodyDef.position.x, groundBodyDef.position.y);
   groundShape.SetFillColor(sf::Color::White);
-  //groundShape.SetOutlineColor(sf::Color::Yellow);
   groundShape.SetOutlineThickness(0);
   groundShape.SetOrigin(groundShape.GetSize().x/2, groundShape.GetSize().y/2);
   // /rect
@@ -164,7 +187,7 @@ int main() {
   b2PolygonShape groundBox;
   groundBox.SetAsBox(groundShape.GetSize().x/2, groundShape.GetSize().y/2);
 
-  groundBody->CreateFixture(&groundBox, 0.f);
+  groundBody->CreateFixture(&groundBox, 1.f);
 
   while (window.IsOpen()) {
     b2Vec2 vel = player.mMyBody->GetLinearVelocity();
@@ -179,8 +202,8 @@ int main() {
         // Jump
         if (myEvent.Key.Code == sf::Keyboard::Space) {
           desiredVel = -20;
-          float velChange = desiredVel - vel.y;
-          float impulse = player.mMyBody->GetMass() * velChange;
+          velChange = desiredVel - vel.y;
+          impulse = player.mMyBody->GetMass() * velChange;
           player.mMyBody->ApplyLinearImpulse(b2Vec2(0, impulse), player.mMyBody->GetWorldCenter());
         }
       }
@@ -188,14 +211,16 @@ int main() {
 
     if (sf::Keyboard::IsKeyPressed(sf::Keyboard::Left)) {
       desiredVel = -5;
+      velChange = desiredVel - vel.x;
+      impulse = player.mMyBody->GetMass() * velChange;
+      player.mMyBody->ApplyLinearImpulse(b2Vec2(impulse, 0),  player.mMyBody->GetWorldCenter());
 
     } else if (sf::Keyboard::IsKeyPressed(sf::Keyboard::Right)) {
       desiredVel = 5;
+      velChange = desiredVel - vel.x;
+      impulse = player.mMyBody->GetMass() * velChange;
+      player.mMyBody->ApplyLinearImpulse(b2Vec2(impulse, 0),  player.mMyBody->GetWorldCenter());
     }
-
-    velChange = desiredVel - vel.x;
-    impulse = player.mMyBody->GetMass() * velChange;
-    player.mMyBody->ApplyLinearImpulse(b2Vec2(impulse, 0),  player.mMyBody->GetWorldCenter());
 
     player.mShape.SetPosition(player.mMyBody->GetPosition().x, player.mMyBody->GetPosition().y);
 
@@ -206,6 +231,7 @@ int main() {
     // put shit here
       
     window.Draw(groundShape);
+    window.Draw(chainShape);
     player.Render(window);
 
     // /putshithere
